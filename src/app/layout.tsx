@@ -17,7 +17,7 @@ const barlowCondensed = Barlow_Condensed({
 export const metadata: Metadata = {
   title: "Elon Intelligence",
   description:
-    "Superior intelligence, now with legs. Grab an Elon, throw him around, launch rockets and ask the oracle. A parody.",
+    "Superior intelligence, now with legs. Grab an Elon, throw him around, launch rockets and ask the oracle.",
 };
 
 export const viewport: Viewport = {

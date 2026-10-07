@@ -87,7 +87,7 @@ export default function SiteShell() {
           ))}
         </nav>
 
-        <span className="label pointer-events-auto hidden text-bone/45 lg:inline">Parody · Not affiliated</span>
+        <span className="hidden w-[180px] lg:block" />
       </header>
 
       <AnimatePresence mode="wait">
@@ -107,7 +107,7 @@ export default function SiteShell() {
       {tab !== "play" && (
         <footer className="label relative flex flex-col items-center gap-2 border-t border-white/10 px-6 py-8 text-center text-bone/35 sm:flex-row sm:justify-between sm:px-10">
           <span>Elon Intelligence © 2026</span>
-          <span>A parody. Not affiliated with Elon Musk, Tesla, SpaceX or X. No Elons were harmed.</span>
+          <span>No Elons were harmed.</span>
         </footer>
       )}
     </div>

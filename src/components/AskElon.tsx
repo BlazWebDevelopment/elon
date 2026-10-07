@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion, useAnimate } from "motion/react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { CHATTER, pick } from "@/lib/quotes";
 
 const RULES: [RegExp, string[]][] = [
@@ -43,6 +43,141 @@ const SUGGESTIONS = [
 
 type Msg = { id: number; q: string; a: string };
 
+type PuffSpec = { dx: number; dy: number; scale: number; delay: number; duration: number };
+type Smoke = { id: number; puffs: PuffSpec[]; wisps: PuffSpec[]; total: number };
+
+const STONED = [
+  "Wow.",
+  "Concerning.",
+  "We're definitely in a simulation.",
+  "First principles, man.",
+  "Interesting…",
+  "Next year. Definitely next year.",
+  "I'm not a robot. I'm vibing.",
+];
+
+const MOUTH = { x: "44%", y: "77.5%" };
+
+const INHALE_END = 1.7;
+const EXHALE_AT = 2.1;
+const SETTLE = 4.6;
+
+const rand = (a: number, b: number) => a + Math.random() * (b - a);
+
+function makeSmoke(): Smoke {
+  const side = Math.random() < 0.5 ? -1 : 1;
+  const puffs = Array.from({ length: 36 }, (_, i) => {
+    const t = i / 35;
+    const angle = ((-28 + rand(-24, 24)) * Math.PI) / 180;
+    const dist = rand(150, 290) * (0.6 + 0.4 * (1 - t));
+    return {
+      dx: Math.cos(angle) * dist * side,
+      dy: Math.sin(angle) * dist - rand(0, 40),
+      scale: rand(0.95, 1.7),
+      delay: EXHALE_AT + i * 0.04 + rand(0, 0.04),
+      duration: rand(2.2, 2.7),
+    };
+  });
+  const wisps = Array.from({ length: 8 }, (_, i) => ({
+    dx: rand(-12, 12),
+    dy: rand(-80, -50),
+    scale: rand(0.8, 1.2),
+    delay: 0.7 + i * 0.12,
+    duration: rand(1.4, 1.8),
+  }));
+  const total = Math.max(...puffs.map((p) => p.delay + p.duration));
+  return { id: Date.now(), puffs, wisps, total };
+}
+
+const JOINT_TIMES = [0, 0.26, 0.5, 0.74, 1];
+const JOINT_DURATION = 2.3;
+
+function SmokeBreak({ smoke }: { smoke: Smoke }) {
+  const id = useId();
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden>
+      <motion.div
+        className="absolute left-[54%] top-[77.5%] aspect-[140/28] w-[52%] origin-left -translate-y-1/2"
+        initial={{ x: "70%", y: "120%", rotate: 18, opacity: 0 }}
+        animate={{
+          x: ["70%", "0%", "-3%", "-2%", "80%"],
+          y: ["120%", "0%", "0%", "0%", "140%"],
+          rotate: [18, -10, -12, -12, 20],
+          opacity: [0, 1, 1, 1, 0],
+        }}
+        transition={{
+          duration: JOINT_DURATION,
+          times: JOINT_TIMES,
+          ease: ["easeOut", "easeInOut", "easeInOut", "easeIn"],
+        }}
+        style={{ willChange: "transform, opacity" }}
+      >
+        <svg viewBox="0 0 140 28" className="absolute inset-0 h-full w-full overflow-visible">
+          <defs>
+            <linearGradient id={`${id}-paper`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#ffffff" />
+              <stop offset="0.55" stopColor="#ece7dc" />
+              <stop offset="1" stopColor="#c9c1b0" />
+            </linearGradient>
+            <radialGradient id={`${id}-ember`}>
+              <stop offset="0" stopColor="#fff6c2" />
+              <stop offset="0.35" stopColor="#ffb347" />
+              <stop offset="0.7" stopColor="#ff4d1a" />
+              <stop offset="1" stopColor="#8a1600" />
+            </radialGradient>
+          </defs>
+          <path d="M2 11 L128 4 Q136 14 128 24 L2 17 Q0 14 2 11 Z" fill={`url(#${id}-paper)`} />
+          <path d="M2 11 L18 10 L18 18 L2 17 Q0 14 2 11 Z" fill="#d6c59d" />
+          <path d="M44 8 L48 19 M74 6 L78 21 M104 5 L108 22" stroke="#b5ad9b" strokeWidth="0.9" opacity="0.7" />
+          <ellipse cx="129" cy="14" rx="5" ry="10" fill="#5f5f5f" />
+          <ellipse cx="132" cy="14" rx="5.5" ry="8.5" fill={`url(#${id}-ember)`} />
+        </svg>
+        <motion.span
+          className="absolute -right-[6%] top-1/2 aspect-square w-[22%] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,170,70,0.95),rgba(255,77,26,0.45)_40%,transparent_70%)] blur-[2px]"
+          animate={{ scale: [0.6, 0.7, 1.9, 1.5, 0.6], opacity: [0.5, 0.6, 1, 0.9, 0] }}
+          transition={{ duration: JOINT_DURATION, times: JOINT_TIMES, ease: "easeInOut" }}
+        />
+        {smoke.wisps.map((w, i) => (
+          <Puff key={i} puff={w} className="right-[-2%] top-1/2 w-[22%]" soft />
+        ))}
+      </motion.div>
+
+      {smoke.puffs.map((p, i) => (
+        <Puff key={i} puff={p} className="w-[36%]" style={{ left: MOUTH.x, top: MOUTH.y }} />
+      ))}
+    </div>
+  );
+}
+
+function Puff({
+  puff,
+  className = "",
+  style,
+  soft,
+}: {
+  puff: PuffSpec;
+  className?: string;
+  style?: React.CSSProperties;
+  soft?: boolean;
+}) {
+  return (
+    <motion.span
+      className={`absolute aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(205,205,210,0.85),rgba(170,170,178,0.5)_32%,rgba(150,150,158,0.16)_54%,transparent_70%)] ${className}`}
+      style={{ ...style, willChange: "transform, opacity" }}
+      initial={{ x: 0, y: 0, scale: 0.12, opacity: 0 }}
+      animate={{ x: puff.dx, y: puff.dy, scale: puff.scale, opacity: [0, soft ? 0.7 : 0.95, soft ? 0.45 : 0.65, 0] }}
+      transition={{
+        duration: puff.duration,
+        delay: puff.delay,
+        ease: [0.22, 0.61, 0.36, 1],
+        opacity: { duration: puff.duration, delay: puff.delay, times: [0, 0.14, 0.5, 1], ease: "easeInOut" },
+      }}
+    />
+  );
+}
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 function answer(q: string) {
   for (const [re, answers] of RULES) if (re.test(q)) return pick(answers);
   return pick(FALLBACK);
@@ -53,10 +188,12 @@ export default function AskElon() {
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState<string | null>(null);
   const [quip, setQuip] = useState<string | null>(null);
+  const [smoke, setSmoke] = useState<Smoke | null>(null);
   const [scope, animate] = useAnimate<HTMLDivElement>();
   const stageRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
+  const busyRef = useRef(false);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -77,7 +214,7 @@ export default function AskElon() {
 
   const ask = async (raw: string) => {
     const q = raw.trim();
-    if (!q || thinking) return;
+    if (!q || thinking || smoke) return;
     setInput("");
     setQuip(null);
     setThinking(pick(THINKING));
@@ -89,10 +226,30 @@ export default function AskElon() {
     animate(scope.current, { y: [0, -22, 0], scale: [1, 1.06, 1] }, { duration: 0.45 });
   };
 
-  const poke = () => {
-    if (thinking) return;
-    setQuip(pick(CHATTER));
-    animate(scope.current, { rotate: [0, -12, 10, -6, 0], scale: [1, 0.92, 1.04, 1] }, { duration: 0.6 });
+  const poke = async () => {
+    if (busyRef.current || thinking) return;
+    busyRef.current = true;
+    const next = makeSmoke();
+    setQuip(null);
+    setSmoke(next);
+    animate(
+      scope.current,
+      {
+        rotate: [0, -1, -6, -6, 3, 0],
+        y: [0, -2, -8, -8, 4, 0],
+        scale: [1, 1.005, 1.035, 1.035, 0.99, 1],
+      },
+      {
+        duration: SETTLE,
+        times: [0, 0.6 / SETTLE, INHALE_END / SETTLE, EXHALE_AT / SETTLE, 2.9 / SETTLE, 1],
+        ease: ["easeOut", "easeInOut", "linear", "easeOut", "easeInOut"],
+      },
+    );
+    await wait(SETTLE * 1000);
+    setQuip(pick(STONED));
+    await wait((next.total - SETTLE) * 1000 + 150);
+    setSmoke(null);
+    busyRef.current = false;
   };
 
   return (
@@ -117,15 +274,23 @@ export default function AskElon() {
             style={{ transform: "rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))" }}
           >
             <div className="animate-float">
-              <motion.div ref={scope} className="cursor-pointer" onClick={poke} whileHover={{ scale: 1.03 }}>
-                <Image
-                  src="/elon-head.png"
-                  alt="Elon Intelligence oracle head"
-                  width={270}
-                  height={388}
-                  priority
-                  className="h-auto w-full grayscale drop-shadow-[0_30px_40px_rgba(0,0,0,0.7)]"
-                />
+              <motion.div
+                className={smoke || thinking ? "cursor-default" : "cursor-pointer"}
+                onClick={poke}
+                whileHover={smoke || thinking ? undefined : { scale: 1.03 }}
+                transition={{ type: "spring", stiffness: 260, damping: 22 }}
+              >
+                <div ref={scope} className="relative will-change-transform">
+                  <Image
+                    src="/elon-head.png"
+                    alt="Elon Intelligence oracle head"
+                    width={270}
+                    height={388}
+                    priority
+                    className="h-auto w-full grayscale drop-shadow-[0_30px_40px_rgba(0,0,0,0.7)]"
+                  />
+                  {smoke && <SmokeBreak key={smoke.id} smoke={smoke} />}
+                </div>
               </motion.div>
             </div>
           </div>
@@ -146,6 +311,13 @@ export default function AskElon() {
         </div>
         <p className="label mt-2 text-bone/40">
           Neural link: <span className="text-bone">established</span> · IQ: <span className="text-bone">yes</span>
+        </p>
+        <p
+          className={`label mt-3 text-[10px] text-bone/50 transition-opacity duration-500 ${
+            !smoke && !thinking ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          Click his face. He&apos;s earned a break.
         </p>
       </div>
 
@@ -207,7 +379,7 @@ export default function AskElon() {
           />
           <button
             type="submit"
-            disabled={!input.trim() || !!thinking}
+            disabled={!input.trim() || !!thinking || !!smoke}
             className="btn-solid h-12 px-6 text-xs disabled:pointer-events-none disabled:opacity-40"
           >
             Ask
@@ -219,7 +391,7 @@ export default function AskElon() {
               key={s}
               type="button"
               onClick={() => ask(s)}
-              disabled={!!thinking}
+              disabled={!!thinking || !!smoke}
               className="border border-white/15 px-3 py-2 text-xs text-bone/60 transition hover:border-bone hover:text-bone disabled:opacity-40"
             >
               {s}
