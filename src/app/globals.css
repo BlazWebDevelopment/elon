@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@theme {
+  --color-void: #000000;
+  --color-bone: #ffffff;
+  --color-steel: #8b8f96;
+  --color-graphite: #1a1b1e;
+  --color-atmo: #7fb2ff;
+
+  --font-display: var(--font-barlow), "Arial Narrow", sans-serif;
+  --font-cond: var(--font-barlow-condensed), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-barlow), system-ui, sans-serif;
+
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-spin-slow: spin 24s linear infinite;
+  --animate-spin-slower: spin 40s linear infinite reverse;
+  --animate-blink: blink 1s steps(2, start) infinite;
+  --animate-pulse-glow: pulse-glow 2.4s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-14px);
+    }
+  }
+
+  @keyframes blink {
+    to {
+      visibility: hidden;
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
+html {
+  background: #000;
+  color: #fff;
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: #fff;
+  color: #000;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.btn-ghost:hover {
+  background: #fff;
+  color: #000;
+}
+
+.btn-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.btn-solid:hover {
+  background: transparent;
+  color: #fff;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
