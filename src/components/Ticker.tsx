@@ -1,33 +1,25 @@
-"use client";
+import { TICKER } from "@/lib/quotes";
 
-import { useEffect, useState } from "react";
-
-export default function Ticker({ lines }: { lines: readonly string[] }) {
-  const [index, setIndex] = useState(0);
-  const [count, setCount] = useState(0);
-  const line = lines[index % lines.length];
-
-  useEffect(() => {
-    const done = count >= line.length;
-    const id = window.setTimeout(
-      () => {
-        if (done) {
-          setCount(0);
-          setIndex((i) => i + 1);
-        } else setCount((c) => c + 1);
-      },
-      done ? 2600 : 38 + Math.random() * 40,
-    );
-    return () => window.clearTimeout(id);
-  }, [count, line]);
-
+export default function Ticker() {
+  const items = [...TICKER, ...TICKER];
   return (
-    <p
-      className="h-6 font-display text-[13px] font-semibold uppercase tracking-[0.2em] text-bone sm:text-[15px]"
-      aria-live="polite"
-    >
-      {line.slice(0, count)}
-      <span className="ml-1 inline-block h-[1em] w-[2px] translate-y-[0.15em] animate-blink bg-bone" />
-    </p>
+    <div className="relative flex h-11 items-stretch overflow-hidden bg-red text-white" aria-label="Breaking news">
+      <span className="eyebrow relative z-10 flex shrink-0 items-center gap-2 bg-deep-red px-4 text-[11px] sm:px-6">
+        <span className="size-2 animate-pulse rounded-full bg-white" />
+        Breaking
+      </span>
+      <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+        <ul className="flex w-max animate-marquee items-center whitespace-nowrap">
+          {items.map((t, i) => (
+            <li key={i} className="flex items-center text-[13px] font-medium" aria-hidden={i >= TICKER.length}>
+              <span className="px-6">{t}</span>
+              <span aria-hidden className="text-amber">
+                ★
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }

@@ -1,33 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow, Barlow_Condensed } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-const barlow = Barlow({
-  variable: "--font-barlow",
-  weight: ["300", "400", "500", "600", "700"],
+const serif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  weight: "400",
+  style: ["normal", "italic"],
   subsets: ["latin"],
 });
 
-const barlowCondensed = Barlow_Condensed({
-  variable: "--font-barlow-condensed",
+const sans = Instrument_Sans({
+  variable: "--font-instrument-sans",
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Elon Intelligence",
+  title: "Trump Intelligence",
   description:
-    "Superior intelligence, now with legs. Grab an Elon, throw him around, launch rockets and ask the oracle.",
+    "The most tremendous website, maybe ever. Play Make the Lawn Great Again, sign your own executive order and ask the President anything.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#0d132d",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${barlow.variable} ${barlowCondensed.variable} h-full antialiased`}>
-      <body className="min-h-full text-bone">{children}</body>
+    <html lang="en" className={`${serif.variable} ${sans.variable} h-full antialiased`}>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
