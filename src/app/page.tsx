@@ -1,4 +1,5 @@
 import Agenda from "@/components/Agenda";
+import CoinCA from "@/components/CoinCA";
 import LawnGame from "@/components/LawnGame";
 import OrderDesk from "@/components/OrderDesk";
 import PressBriefing from "@/components/PressBriefing";
@@ -11,6 +12,7 @@ export default function Home() {
     <>
       <SiteHeader />
       <main>
+        <CoinCA />
         <LawnGame />
         <Ticker />
         <Agenda />
