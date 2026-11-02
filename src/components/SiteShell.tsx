@@ -55,8 +55,8 @@ export default function SiteShell() {
           <Image
             src="/elon-head.png"
             alt=""
-            width={27}
-            height={39}
+            width={40}
+            height={40}
             className="h-auto w-6 grayscale contrast-125 sm:w-7"
             priority
           />

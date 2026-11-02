@@ -257,8 +257,8 @@ export default function AskElon() {
                 <Image
                   src="/elon-head.png"
                   alt="Elon Intelligence oracle head"
-                  width={270}
-                  height={388}
+                  width={400}
+                  height={400}
                   priority
                   className="h-auto w-full grayscale drop-shadow-[0_30px_40px_rgba(0,0,0,0.7)]"
                 />

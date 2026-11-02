@@ -29,7 +29,7 @@ const RKNEE = 9;
 const RFOOT = 10;
 const JOINTS = 11;
 
-const HEAD_ASPECT = 270 / 388;
+const HEAD_ASPECT = 1;
 const STEP = 1 / 120;
 const MAX_ELONS = 14;
 

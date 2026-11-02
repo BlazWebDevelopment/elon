@@ -399,7 +399,7 @@ export default function LaunchPad() {
           ctx.save();
           ctx.translate(s.head.x, toScreen(s.head.y));
           ctx.rotate(s.head.rot);
-          ctx.drawImage(head, (-hh * 0.696) / 2, -hh / 2, hh * 0.696, hh);
+          ctx.drawImage(head, -hh / 2, -hh / 2, hh, hh);
           ctx.restore();
         }
       }
@@ -742,7 +742,7 @@ function drawShip(ctx: CanvasRenderingContext2D, k: number, head: HTMLImageEleme
   ctx.fillRect(-r, wy - r, r * 2, r * 2);
   if (head.complete && head.naturalWidth) {
     const hh = r * 2.5;
-    ctx.drawImage(head, -hh * 0.348, wy - hh * 0.42, hh * 0.696, hh);
+    ctx.drawImage(head, -hh / 2, wy - hh * 0.42, hh, hh);
   }
   const shine = ctx.createLinearGradient(-r, wy - r, r, wy + r);
   shine.addColorStop(0, "rgba(255,255,255,0.35)");
